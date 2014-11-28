@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">OnibusSocial</string>
+    <string name="title_section1">Mapa</string>
+    <string name="title_section2">Ser Acompanhado</string>
+    <string name="action_settings">Preferências</string>
+    <string name="spinner_title">Selecionar Ônibus</string>
+    <string name="descricao_ser_acompanhado">A partir do momento que você apertar nesse botão compartilharemos a posição do ônibus que você está 
+        atualmente com qualquer pessoa que esteja usando esse APP. Nenhuma informação sua será divulgada.</string>
+    <string name="button_iniciar">Iniciar</string>
+    <string name="action_about">Sobre</string>
+    <string name="sobre">Esse aplicativo foi criado por João Eduardo Ribeiro de Medeiros, estudante de Bacharelado em Tecnologia da Informação pela
+         Universidade Federal do Rio Grande do Norte (UFRN).</string>
+    <string name="UFRN">UFRN</string>
+    <string name="IMD">IMD</string>
+
+</resources>
