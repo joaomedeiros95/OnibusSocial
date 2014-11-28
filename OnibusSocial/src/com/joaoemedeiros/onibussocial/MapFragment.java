@@ -100,12 +100,12 @@ public class MapFragment extends Fragment {
 							
 							@Override
 							public void run() {
-								addMarcador(latitude, longitude);
+								addMarcador(latitude, longitude, "44", "Santa Maria");
 							}
 						});
 					}
 					try {
-						Thread.sleep(30000);
+						Thread.sleep(5000);
 					} catch (InterruptedException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
@@ -168,11 +168,11 @@ public class MapFragment extends Fragment {
 		googleMap.clear();
 	}
 	
-	public void addMarcador(double latitude, double longitude) {
+	public void addMarcador(double latitude, double longitude, String linha, String empresa) {
 		// create marker
 		MarkerOptions marker = new MarkerOptions().position(new LatLng(latitude, longitude))
-												  .title("44")
-												  .snippet("Santa Maria")
+												  .title(linha)
+												  .snippet(empresa)
 												  .icon(BitmapDescriptorFactory.fromResource(R.drawable.onbius));
 		googleMap.addMarker(marker);
 	}

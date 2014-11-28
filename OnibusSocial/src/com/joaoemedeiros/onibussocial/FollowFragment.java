@@ -95,7 +95,7 @@ public class FollowFragment extends Fragment {
 									Log.d("Location Received", null);
 								else {
 									Log.d("Location Received", "lat :" + location.getLatitude() + ",lng :" + location.getLongitude()+" in "+time);
-									connector.setLocationTracker(location.getLatitude(), location.getLatitude(), onibus_selecionado, uniqueID);
+									connector.setLocationTracker(location.getLatitude(), location.getLongitude(), onibus_selecionado, uniqueID);
 								}
 							}
 						}, new IntentFilter(GPSTracker.LOCATION_RECEIVED));
