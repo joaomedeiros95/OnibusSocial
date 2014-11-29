@@ -1,137 +1,121 @@
 package com.joaoemedeiros.onibussocial.services;
 
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.location.Location;
+import android.location.LocationListener;
 import android.location.LocationManager;
+import android.location.LocationProvider;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.IBinder;
-import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GooglePlayServicesClient;
-import com.google.android.gms.location.LocationClient;
-import com.google.android.gms.location.LocationRequest;
+import com.joaoemedeiros.onibussocial.R;
+import com.joaoemedeiros.onibussocial.mysql.ConnectorImpl;
 
-public class GPSTracker extends Service implements GooglePlayServicesClient.ConnectionCallbacks, GooglePlayServicesClient.OnConnectionFailedListener,
-		com.google.android.gms.location.LocationListener {
+public class GPSTracker extends Service {
 	
-	private static final LocationRequest REQUEST = LocationRequest.create()
-			.setInterval(0).setFastestInterval(0)
-			.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
+	private static final long MIN_TIME_MILLIS = 2000;
+	private static final long MIN_DIST_METERS = 10;
+	private static final float MIN_ACURRACY_METERS = 35;
+	private static int onibus = 0;
+	private static int id = 0;
+	
 	public static final String LOCATION_RECEIVED = "fused.location.received";
-	private Long now;
-	private LocationClient mLocationClient;
-	private final Object locking = new Object();
-	private Runnable onFusedLocationProviderTimeout;
-	private Handler handler = new Handler();
+	
+	private LocationManager lm;
+	private LocationListener locationListener;
+	private NotificationManager nNM;
+	private int lastStatus = 0;
 
-	@Override
-	public int onStartCommand(Intent intent, int flags, int startId) {
-		super.onStartCommand(intent, flags, startId);
-		now = Long.valueOf(System.currentTimeMillis());
-		mLocationClient = new LocationClient(this, this, this);
-		mLocationClient.connect();
-		return START_STICKY;
-	}
-
-	@Override
-	public void onConnected(Bundle bundle) {
-		Log.d("Location",
-				"Fused Location Provider got connected successfully");
-		mLocationClient.requestLocationUpdates(REQUEST, this);
-		onFusedLocationProviderTimeout = new Runnable() {
-			public void run() {
-				Log.d("Location", "location Timeout");
-				Location lastbestStaleLocation = getLastBestStaleLocation();
-				sendLocationUsingBroadCast(lastbestStaleLocation);
-				if (lastbestStaleLocation != null)
-					Log.d("Location",
-							"Last best location returned ["
-									+ lastbestStaleLocation.getLatitude()
-									+ ","
-									+ lastbestStaleLocation.getLongitude()
-									+ "] in "
-									+ (Long.valueOf(System.currentTimeMillis()) - now)
-									+ " ms");
-				if (mLocationClient.isConnected())
-					mLocationClient.disconnect();
-			}
-		};
-		handler.postDelayed(onFusedLocationProviderTimeout, 20000);// 20 sec
-	}
-
-	private void sendLocationUsingBroadCast(Location location) {
-		Intent locationBroadcast = new Intent(
-				GPSTracker.LOCATION_RECEIVED);
-		locationBroadcast.putExtra("LOCATION", location);
-		locationBroadcast.putExtra("TIME",
-				Long.valueOf(System.currentTimeMillis() - now) + " ms");
-		LocalBroadcastManager.getInstance(this)
-				.sendBroadcast(locationBroadcast);
-		if(System.currentTimeMillis() - now >= 3600000) {
-			stopSelf();
-		}
-	}
-
-	@Override
-	public void onDisconnected() {
-		Log.d("Location",
-				"Fused Location Provider got disconnected successfully");
-		stopSelf();
-	}
-
-	@Override
-	public void onLocationChanged(Location location) {
-		synchronized (locking) {
-			Log.d("Location", "Location received successfully ["
-					+ location.getLatitude() + "," + location.getLongitude()
-					+ "] in "
-					+ (Long.valueOf(System.currentTimeMillis() - now)) + " ms");
-			handler.removeCallbacks(onFusedLocationProviderTimeout);
-//			if (mLocationClient.isConnected())
-//				mLocationClient.removeLocationUpdates(this);
-			sendLocationUsingBroadCast(location);
-//			if (mLocationClient.isConnected())
-//				mLocationClient.disconnect();
-		}
-	}
-
-	@Override
-	public void onConnectionFailed(ConnectionResult connectionResult) {
-		Log.d("Location",
-				"Error connecting to Fused Location Provider");
+	public void startLoggerService() {
+		lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+		locationListener = new MyLocationListener();
+		
+		lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, MIN_TIME_MILLIS, MIN_DIST_METERS, locationListener);
+		lm.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, MIN_TIME_MILLIS, MIN_DIST_METERS, locationListener);
 	}
 	
-	public Location getLastBestStaleLocation() {
-		Location bestResult = null;
-		LocationManager locMgr = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-		Location lastFusedLocation = mLocationClient.getLastLocation();
-		Location gpsLocation = locMgr
-				.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-		Location networkLocation = locMgr
-				.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-		if (gpsLocation != null && networkLocation != null) {
-			if (gpsLocation.getTime() > networkLocation.getTime())
-				bestResult = gpsLocation;
-		} else if (gpsLocation != null) {
-			bestResult = gpsLocation;
-		} else if (networkLocation != null) {
-			bestResult = networkLocation;
+	public void shutdownLoggerService() {
+		lm.removeUpdates(locationListener);
+	}
+	
+	public class MyLocationListener implements LocationListener {
+		
+		private ConnectorImpl connector = new ConnectorImpl();
+		
+		@Override
+		public void onLocationChanged(Location location) {
+			if(location != null) {
+				boolean pontoEnviado = false;
+				if(location.hasAccuracy() && location.getAccuracy() <= MIN_ACURRACY_METERS) {
+					pontoEnviado = true;
+					connector.setLocationTracker(location.getLatitude(), location.getLongitude(), onibus, id);
+				}
+				if(pontoEnviado) {
+					Log.d("Location Received", "lat :" + location.getLatitude() + ",lng :" + location.getLongitude());
+				} else {
+					Log.d("Location Not Received", "localização não recebida");
+				}
+			}
 		}
-		// take Fused Location in to consideration while checking for last stale
-		// location
-		if (bestResult != null && lastFusedLocation != null) {
-			if (bestResult.getTime() < lastFusedLocation.getTime())
-				bestResult = lastFusedLocation;
+		
+		@Override
+		public void onStatusChanged(String provider, int status, Bundle extras) {
+			String showStatus = null;
+			if (status == LocationProvider.AVAILABLE)
+				showStatus = "Available";
+			if (status == LocationProvider.TEMPORARILY_UNAVAILABLE)
+				showStatus = "Temporarily Unavailable";
+			if (status == LocationProvider.OUT_OF_SERVICE)
+				showStatus = "Out of Service";
+			if (status != lastStatus) {
+				Log.d("Novo Status", showStatus);
+			}
+			lastStatus = status;
 		}
-		return bestResult;
+		
+		@Override
+		public void onProviderEnabled(String provider) {
+			Log.d("Provider", "Disabled");
+		}
+		
+		@Override
+		public void onProviderDisabled(String provider) {
+			Log.d("Provider", "Enabled");
+		}
+		
+	}
+	
+	@Override
+	public void onCreate() {
+		super.onCreate();
+		
+		nNM = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+		startLoggerService();
+		showNotification();
 	}
 
+	@SuppressWarnings("deprecation")
+	private void showNotification() {
+		CharSequence text = "OnibusSocial está coletando seus dados de GPS.";
+		Notification notificacao = new Notification.Builder(this).setSmallIcon(R.drawable.onbius)
+				                                                 .setContentTitle("GPSTracker")
+				                                                 .setContentText(text)
+				                                                 .getNotification();
+		notificacao.flags |= Notification.FLAG_NO_CLEAR;
+				
+		PendingIntent contentIntent = PendingIntent.getActivity(this, 0, new Intent(this, GPSTracker.class)
+																, 0);
+		notificacao.setLatestEventInfo(this, "GPSTracker", text, contentIntent);
+		nNM.notify("OnibusSocial está coletando seus dados de GPS.", 1, notificacao);
+	}
+	
 	@Override
 	public IBinder onBind(Intent intent) {
 		return null;
@@ -139,9 +123,17 @@ public class GPSTracker extends Service implements GooglePlayServicesClient.Conn
 	
 	@Override
 	public void onDestroy() {
-		//TODO: Remover antes de mandar para Google Play
 		Toast.makeText(getApplicationContext(), "Serviço Finalizado!", Toast.LENGTH_LONG).show();
-		handler.removeCallbacks(onFusedLocationProviderTimeout);
-		mLocationClient.disconnect();
+		shutdownLoggerService();
+		nNM.cancel("OnibusSocial está coletando seus dados de GPS.", 1);
 	};
+	
+	public static void setOnibus(int onibus) {
+		GPSTracker.onibus = onibus;
+	}
+
+	public static void setId(int id) {
+		GPSTracker.id = id;
+	}
 }
+	

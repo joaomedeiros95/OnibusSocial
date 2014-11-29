@@ -37,7 +37,7 @@ public class HttpConnectionOnibusBD {
 				List<NameValuePair> nameValuePair = new ArrayList<NameValuePair>();
 				nameValuePair.add(new BasicNameValuePair("id", String.valueOf(id)));
 				nameValuePair.add(new BasicNameValuePair("onibus", String.valueOf(id_onibus)));
-				nameValuePair.add(new BasicNameValuePair("localizacao", String.valueOf(latitude) + "&" + String.valueOf(longitude)));
+				nameValuePair.add(new BasicNameValuePair("localizacao", String.valueOf(latitude) + ":" + String.valueOf(longitude)));
 				
 				try {
 					httpPost.setEntity(new UrlEncodedFormEntity(nameValuePair));

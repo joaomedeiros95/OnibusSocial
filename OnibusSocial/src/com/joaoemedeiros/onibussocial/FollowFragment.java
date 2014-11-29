@@ -5,15 +5,10 @@ import java.util.List;
 
 import android.app.ActivityManager;
 import android.app.ActivityManager.RunningServiceInfo;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
-import android.location.Location;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.content.LocalBroadcastManager;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -80,25 +75,9 @@ public class FollowFragment extends Fragment {
 				if(!isMyServiceRunning(GPSTracker.class)) {
 					if(onibus_selecionado > 0) {
 						final int uniqueID = connector.getUniqueID();
+						GPSTracker.setId(uniqueID);
+						GPSTracker.setOnibus(onibus_selecionado);
 						getActivity().startService(new Intent(getActivity(), GPSTracker.class));
-						LocalBroadcastManager.getInstance(getActivity()).registerReceiver(new BroadcastReceiver() {
-							@Override
-							public void onReceive(Context context, Intent intent) {
-								Location location = null;
-								String time = "";
-								if (intent.getExtras() != null)
-								{
-									location = (Location) intent.getExtras().get("LOCATION");
-									time = intent.getExtras().getString("TIME");
-								}
-								if (location == null)
-									Log.d("Location Received", null);
-								else {
-									Log.d("Location Received", "lat :" + location.getLatitude() + ",lng :" + location.getLongitude()+" in "+time);
-									connector.setLocationTracker(location.getLatitude(), location.getLongitude(), onibus_selecionado, uniqueID);
-								}
-							}
-						}, new IntentFilter(GPSTracker.LOCATION_RECEIVED));
 						button.setText("Parar");
 					} else {
 						Toast.makeText(getActivity(), "Selecione um ônibus primeiro!", Toast.LENGTH_LONG).show();

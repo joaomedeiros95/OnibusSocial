@@ -3,6 +3,7 @@ package com.joaoemedeiros.onibussocial;
 import java.util.ArrayList;
 import java.util.List;
 
+import android.location.Location;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -14,6 +15,8 @@ import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import com.google.android.gms.maps.CameraUpdate;
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
@@ -91,16 +94,17 @@ public class MapFragment extends Fragment {
 					});
 					List<Localizacao> list = connect.getHTTPLocalizacao(onibus_selecionado);
 					for(Localizacao loc : list) {
-						String[] parts = loc.getLocalizacao().split("&");
+						String[] parts = loc.getLocalizacao().split(":");
 						final double latitude = Double.parseDouble(parts[0]);
 						final double longitude = Double.parseDouble(parts[1]);
+						final Onibus onibus = onibusDAO.getOnibus(loc.getId_onibus(), getActivity());
 						if(getActivity() == null)
 							break;
 						getActivity().runOnUiThread(new Runnable() {
 							
 							@Override
 							public void run() {
-								addMarcador(latitude, longitude, "44", "Santa Maria");
+								addMarcador(latitude, longitude, onibus.getLinha(), onibus.getNomeEmpresa());
 							}
 						});
 					}
@@ -187,6 +191,19 @@ public class MapFragment extends Fragment {
                         "Sorry! unable to create maps", Toast.LENGTH_SHORT)
                         .show();
             }
+            
+            googleMap.setOnMyLocationChangeListener(new GoogleMap.OnMyLocationChangeListener() {
+                @Override
+                public void onMyLocationChange(Location location) {
+
+                        CameraUpdate center=CameraUpdateFactory.newLatLng(new LatLng(location.getLatitude(), location.getLongitude()));
+                        CameraUpdate zoom=CameraUpdateFactory.zoomTo(13);
+                        googleMap.moveCamera(center);
+                        googleMap.animateCamera(zoom);
+
+                }
+
+            });
         }
 	}
 
