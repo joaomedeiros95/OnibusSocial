@@ -7,6 +7,7 @@ import android.app.ActivityManager;
 import android.app.ActivityManager.RunningServiceInfo;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -34,6 +35,7 @@ public class FollowFragment extends Fragment {
      * fragment.
      */
     private static final String ARG_SECTION_NUMBER = "section_number";
+    public static final String PREFS_NAME = "OnibusSocialPrefs";
     private Spinner spinner;
     private Button button;
     private ConnectorImpl connector;
@@ -74,7 +76,13 @@ public class FollowFragment extends Fragment {
 				// TODO Auto-generated method stub
 				if(!isMyServiceRunning(GPSTracker.class)) {
 					if(onibus_selecionado > 0) {
-						final int uniqueID = connector.getUniqueID();
+						SharedPreferences settings = getActivity().getSharedPreferences(PREFS_NAME, 0);
+						if(settings.getInt("uniqueID", 0) == 0) {
+							SharedPreferences.Editor editor = settings.edit();
+							editor.putInt("uniqueID", connector.getUniqueID());
+							editor.commit();
+						}
+						final int uniqueID = settings.getInt("uniqueID", 0);
 						GPSTracker.setId(uniqueID);
 						GPSTracker.setOnibus(onibus_selecionado);
 						getActivity().startService(new Intent(getActivity(), GPSTracker.class));

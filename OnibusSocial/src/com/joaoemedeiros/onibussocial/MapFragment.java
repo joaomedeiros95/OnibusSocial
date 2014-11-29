@@ -177,7 +177,7 @@ public class MapFragment extends Fragment {
 		MarkerOptions marker = new MarkerOptions().position(new LatLng(latitude, longitude))
 												  .title(linha)
 												  .snippet(empresa)
-												  .icon(BitmapDescriptorFactory.fromResource(R.drawable.onbius));
+												  .icon(BitmapDescriptorFactory.fromResource(R.drawable.onibus_map));
 		googleMap.addMarker(marker);
 	}
 
