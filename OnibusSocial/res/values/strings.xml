@@ -6,12 +6,14 @@
     <string name="title_section2">Ser Acompanhado</string>
     <string name="action_settings">Preferências</string>
     <string name="spinner_title">Selecionar Ônibus</string>
-    <string name="descricao_ser_acompanhado">A partir do momento que você apertar nesse botão compartilharemos a posição do ônibus que você está 
-        atualmente com qualquer pessoa que esteja usando esse APP. Nenhuma informação sua será divulgada.</string>
+    <string name="descricao_ser_acompanhado">A partir do momento que você apertar o botão de iniciar compartilharemos a posição do ônibus que você está 
+        atualmente com qualquer pessoa que esteja usando esse APP. Nenhuma informação sua será divulgada. Não esqueça de manter o GPS e a conexão com a internet habilitados
+        pois são essenciais para que o aplicativo funcione.</string>
     <string name="button_iniciar">Iniciar</string>
     <string name="action_about">Sobre</string>
-    <string name="sobre">Esse aplicativo foi criado por João Eduardo Ribeiro de Medeiros, estudante de Bacharelado em Tecnologia da Informação pela
-         Universidade Federal do Rio Grande do Norte (UFRN).</string>
+    <string name="sobre">O OnibusSocial foi criado por João Eduardo Ribeiro de Medeiros, estudante de Bacharelado em Tecnologia da Informação pela
+         Universidade Federal do Rio Grande do Norte (UFRN), foi criado como projeto para uma disciplina da Universidade mas foi expandido para uso
+         do público, atualmente só funciona em Natal-RN mas seu desenvolvedor pretende expandí-lo para mais cidades o mais cedo o possível.</string>
     <string name="UFRN">UFRN</string>
     <string name="IMD">IMD</string>
     <string name="servicoiniciado">OnibusSocial está coletando seus dados de GPS.</string>

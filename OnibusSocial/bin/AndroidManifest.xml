@@ -5,7 +5,7 @@
     android:versionName="1.0" >
 
     <uses-sdk
-        android:minSdkVersion="7"
+        android:minSdkVersion="9"
         android:targetSdkVersion="21" />
 
     <uses-permission android:name="android.permission.INTERNET" />
@@ -38,7 +38,8 @@
         </activity>
         <activity
             android:name=".AboutActivity"
-            android:label="@string/action_about" >
+            android:label="@string/action_about"
+            android:parentActivityName=".MainActivity" >
         </activity>
 
         <service android:name=".services.GPSTracker" />
@@ -52,7 +53,8 @@
 
         <activity
             android:name=".PedidosActivity"
-            android:label="@string/title_activity_pedidos" >
+            android:label="@string/title_activity_pedidos"
+            android:parentActivityName=".MainActivity" >
         </activity>
     </application>
 

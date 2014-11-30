@@ -3,6 +3,7 @@ package com.joaoemedeiros.onibussocial;
 import android.content.Intent;
 import android.os.Bundle;
 
+import android.support.v4.app.NavUtils;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -18,6 +19,8 @@ public class AboutActivity extends ActionBarActivity {
 	protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_about);
+        
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 	}
 	
 	@Override
@@ -42,6 +45,9 @@ public class AboutActivity extends ActionBarActivity {
 		case R.id.action_pedidos:
 			Intent intent1 = new Intent(this, PedidosActivity.class);
 			startActivity(intent1);
+			return true;
+		case android.R.id.home:
+			NavUtils.navigateUpFromSameTask(this);
 			return true;
 		default:
 			return super.onOptionsItemSelected(item);

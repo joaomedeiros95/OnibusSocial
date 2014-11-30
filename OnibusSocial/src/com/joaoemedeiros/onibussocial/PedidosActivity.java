@@ -7,6 +7,7 @@ import java.util.regex.Pattern;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.NavUtils;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -40,6 +41,8 @@ public class PedidosActivity extends ActionBarActivity {
 		editEstado = (EditText) findViewById(R.id.editText4);
 		mensagens = new ArrayList<String>();
 		
+		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+		
 		enviar.setOnClickListener(new OnClickListener() {
 			
 			@Override
@@ -50,6 +53,8 @@ public class PedidosActivity extends ActionBarActivity {
 					HttpConnectionOnibusBD http = new HttpConnectionOnibusBD();
 					try {
 						http.postPedido(pedido);
+						Toast.makeText(getApplicationContext(), "Pedido enviado!", Toast.LENGTH_LONG).show();
+						finish();
 					} catch (UnconnectedException e) {
 						e.printStackTrace();
 						Toast.makeText(getApplicationContext(), "OnibusSocial: Verifique sua conexão com Internet", Toast.LENGTH_LONG).show();
@@ -108,9 +113,13 @@ public class PedidosActivity extends ActionBarActivity {
 		/*if (id == R.id.action_settings) {
 			return true;
 		}*/
-		if(id==  R.id.action_about) {
+		if(id ==  R.id.action_about) {
 			Intent intent = new Intent(this, AboutActivity.class);
 			startActivity(intent);
+			return true;
+		}
+		if(id == android.R.id.home) {
+			NavUtils.navigateUpFromSameTask(this);
 			return true;
 		}
 		return super.onOptionsItemSelected(item);
