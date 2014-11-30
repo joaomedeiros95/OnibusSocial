@@ -17,6 +17,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.joaoemedeiros.onibussocial.bd.model.Pedido;
+import com.joaoemedeiros.onibussocial.exceptions.UnconnectedException;
 import com.joaoemedeiros.onibussocial.internet.HttpConnectionOnibusBD;
 
 public class PedidosActivity extends ActionBarActivity {
@@ -47,7 +48,13 @@ public class PedidosActivity extends ActionBarActivity {
 										   editCidade.getText().toString(), editEstado.getText().toString());
 				if(validate(pedido)) {
 					HttpConnectionOnibusBD http = new HttpConnectionOnibusBD();
-					http.postPedido(pedido);
+					try {
+						http.postPedido(pedido);
+					} catch (UnconnectedException e) {
+						e.printStackTrace();
+						Toast.makeText(getApplicationContext(), "OnibusSocial: Verifique sua conexão com Internet", Toast.LENGTH_LONG).show();
+						MainActivity.isConnected();
+					}
 				} else {
 					for(String mensagem : mensagens) 
 						Toast.makeText(getApplicationContext(), mensagem, Toast.LENGTH_LONG).show();

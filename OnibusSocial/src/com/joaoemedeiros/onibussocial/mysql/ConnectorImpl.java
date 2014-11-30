@@ -10,6 +10,7 @@ import org.json.JSONObject;
 import android.util.Log;
 
 import com.joaoemedeiros.onibussocial.bd.model.Localizacao;
+import com.joaoemedeiros.onibussocial.exceptions.UnconnectedException;
 import com.joaoemedeiros.onibussocial.internet.HttpConnectionOnibusBD;
 import com.joaoemedeiros.onibussocial.internet.JSONConstantes;
 
@@ -18,12 +19,12 @@ import com.joaoemedeiros.onibussocial.internet.JSONConstantes;
  */
 public class ConnectorImpl implements Connector {
 	
-	public int getUniqueID() {
+	public int getUniqueID() throws UnconnectedException {
 		HttpConnectionOnibusBD httpcobd = new HttpConnectionOnibusBD();
 		return httpcobd.getUniqueId();
 	}
 	
-	public List<Localizacao> getHTTPLocalizacao(int id_onibus) {
+	public List<Localizacao> getHTTPLocalizacao(int id_onibus) throws UnconnectedException {
 		HttpConnectionOnibusBD httpcobd = new HttpConnectionOnibusBD();
 		String resultadoJSON = httpcobd.getLocalizacao(id_onibus);
 		JSONArray localizacao = new JSONArray();
@@ -58,7 +59,7 @@ public class ConnectorImpl implements Connector {
 	/* (non-Javadoc)
 	 * @see com.joaoemedeiros.onibussocial.mysql.Connector#setLocationTracker(android.content.Context, double, double, int)
 	 */
-	public void setLocationTracker(double latitude, double longitude, int id_onibus, int id) {
+	public void setLocationTracker(double latitude, double longitude, int id_onibus, int id) throws UnconnectedException {
 		Log.d("Saving Location", "Salvando localização atual" + latitude + ", " + longitude);
 		HttpConnectionOnibusBD httpcpl = new HttpConnectionOnibusBD();
 		httpcpl.postLocalizacao(id, id_onibus, latitude, longitude);

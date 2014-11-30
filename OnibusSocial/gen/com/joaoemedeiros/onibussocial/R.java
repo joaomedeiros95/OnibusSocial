@@ -1642,6 +1642,7 @@ containing a value of this type.
         public static final int AppTheme=0x7f0b008c;
         public static final int DropDownListView_Example=0x7f0b0091;
         public static final int DropDownNav_Example=0x7f0b0093;
+        public static final int OnibusSocialTheme=0x7f0b008d;
         public static final int PopupMenu_Example=0x7f0b0090;
         public static final int ProgressBar_Example=0x7f0b0094;
         /**  Mimic text appearance in select_dialog_item.xml 
@@ -1752,8 +1753,9 @@ containing a value of this type.
         /**  Base platform-dependent theme providing a light-themed activity. 
          */
         public static final int Theme_Base_Light=0x7f0b007f;
-        public static final int Theme_Example=0x7f0b008d;
         /**  this style is only referenced in a Light.DarkActionBar based theme 
+ this style is only referenced in a Light.DarkActionBar based theme 
+ this style is only referenced in a Light.DarkActionBar based theme 
          */
         public static final int Theme_Example_Widget=0x7f0b0096;
         /**  Styles in here can be extended for customisation in your application. Each utilises

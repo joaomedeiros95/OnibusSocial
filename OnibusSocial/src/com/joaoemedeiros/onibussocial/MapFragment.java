@@ -24,6 +24,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.joaoemedeiros.onibussocial.bd.model.Localizacao;
 import com.joaoemedeiros.onibussocial.bd.model.Onibus;
+import com.joaoemedeiros.onibussocial.exceptions.UnconnectedException;
 import com.joaoemedeiros.onibussocial.mysql.Connector;
 import com.joaoemedeiros.onibussocial.mysql.ConnectorImpl;
 import com.joaoemedeiros.onibussocial.mysql.OnibusDAO;
@@ -72,7 +73,13 @@ public class MapFragment extends Fragment {
         connect = new ConnectorImpl();
         onibusDAO = OnibusDAO.getDAO();
 
-        onibusDAO.populate(getActivity());
+        try {
+			onibusDAO.populate(getActivity());
+		} catch (UnconnectedException e1) {
+			e1.printStackTrace();
+			Toast.makeText(getActivity(), "OnibusSocial: Verifique sua conexão com Internet", Toast.LENGTH_LONG).show();
+			MainActivity.isConnected();
+		}
         
         /**
          * Thread para popular marcadores 
@@ -92,22 +99,35 @@ public class MapFragment extends Fragment {
 							limparMapa();
 						}
 					});
-					List<Localizacao> list = connect.getHTTPLocalizacao(onibus_selecionado);
-					for(Localizacao loc : list) {
-						String[] parts = loc.getLocalizacao().split(":");
-						final double latitude = Double.parseDouble(parts[0]);
-						final double longitude = Double.parseDouble(parts[1]);
-						final Onibus onibus = onibusDAO.getOnibus(loc.getId_onibus(), getActivity());
-						if(getActivity() == null)
-							break;
+					List<Localizacao> list = null;
+					try {
+						list = connect.getHTTPLocalizacao(onibus_selecionado);
+					} catch (UnconnectedException e1) {
+						e1.printStackTrace();
 						getActivity().runOnUiThread(new Runnable() {
 							
 							@Override
 							public void run() {
-								addMarcador(latitude, longitude, onibus.getLinha(), onibus.getNomeEmpresa());
+								Toast.makeText(getActivity(), "Sem conexão, não será possível ver ônibus.",Toast.LENGTH_SHORT).show();
 							}
 						});
 					}
+					if(list != null)
+						for(Localizacao loc : list) {
+							String[] parts = loc.getLocalizacao().split(":");
+							final double latitude = Double.parseDouble(parts[0]);
+							final double longitude = Double.parseDouble(parts[1]);
+							final Onibus onibus = onibusDAO.getOnibus(loc.getId_onibus(), getActivity());
+							if(getActivity() == null)
+								break;
+							getActivity().runOnUiThread(new Runnable() {
+								
+								@Override
+								public void run() {
+									addMarcador(latitude, longitude, onibus.getLinha(), onibus.getNomeEmpresa());
+								}
+							});
+						}
 					try {
 						Thread.sleep(5000);
 					} catch (InterruptedException e) {

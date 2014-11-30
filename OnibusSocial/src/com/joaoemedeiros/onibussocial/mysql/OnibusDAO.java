@@ -15,6 +15,7 @@ import android.util.Log;
 
 import com.joaoemedeiros.onibussocial.bd.helper.SQLiteHandler;
 import com.joaoemedeiros.onibussocial.bd.model.Onibus;
+import com.joaoemedeiros.onibussocial.exceptions.UnconnectedException;
 import com.joaoemedeiros.onibussocial.internet.HttpConnectionOnibusBD;
 import com.joaoemedeiros.onibussocial.internet.JSONConstantes;
 
@@ -217,7 +218,7 @@ public class OnibusDAO {
 	}
     
     
-    public void populate(Context context) {
+    public void populate(Context context) throws UnconnectedException {
     	resetOnibusDB(context);
     	
     	HttpConnectionOnibusBD httpcobd = new HttpConnectionOnibusBD();

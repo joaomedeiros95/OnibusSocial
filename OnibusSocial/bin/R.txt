@@ -511,6 +511,7 @@ int style AppBaseTheme 0x7f0b008b
 int style AppTheme 0x7f0b008c
 int style DropDownListView_Example 0x7f0b0091
 int style DropDownNav_Example 0x7f0b0093
+int style OnibusSocialTheme 0x7f0b008d
 int style PopupMenu_Example 0x7f0b0090
 int style ProgressBar_Example 0x7f0b0094
 int style TextAppearance_AppCompat_Base_CompactMenu_Dialog 0x7f0b0063
@@ -574,7 +575,6 @@ int style Theme_Base_AppCompat_Light_DarkActionBar 0x7f0b0082
 int style Theme_Base_AppCompat_Light_DialogWhenLarge 0x7f0b0086
 int style Theme_Base_AppCompat_Light_DialogWhenLarge_Base 0x7f0b008a
 int style Theme_Base_Light 0x7f0b007f
-int style Theme_Example 0x7f0b008d
 int style Theme_Example_Widget 0x7f0b0096
 int style Widget_AppCompat_ActionBar 0x7f0b0000
 int style Widget_AppCompat_ActionBar_Solid 0x7f0b0002

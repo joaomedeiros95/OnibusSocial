@@ -23,171 +23,193 @@ import org.json.JSONObject;
 import android.util.Log;
 
 import com.joaoemedeiros.onibussocial.bd.model.Pedido;
+import com.joaoemedeiros.onibussocial.exceptions.UnconnectedException;
 
 public class HttpConnectionOnibusBD {
-	String retorno = "";
-	int idUnique = -1;
-	
-	public void postLocalizacao(final int id, final int id_onibus, final double latitude, final double longitude) {
-		new Thread(new Runnable() {
-			
-			@Override
-			public void run() {
-				HttpClient httpClient = new DefaultHttpClient();
-				HttpPost httpPost = new HttpPost("http://joaoemedeiros.com/services/onibus_social/set_localizacao.php");
-				
-				List<NameValuePair> nameValuePair = new ArrayList<NameValuePair>();
-				nameValuePair.add(new BasicNameValuePair("id", String.valueOf(id)));
-				nameValuePair.add(new BasicNameValuePair("onibus", String.valueOf(id_onibus)));
-				nameValuePair.add(new BasicNameValuePair("localizacao", String.valueOf(latitude) + ":" + String.valueOf(longitude)));
-				
-				try {
-					httpPost.setEntity(new UrlEncodedFormEntity(nameValuePair));
-				} catch (UnsupportedEncodingException e) {
-					e.printStackTrace();
-				}
-				
-				try {
-					HttpResponse response = httpClient.execute(httpPost);
-					
-					Log.d("Http Response", response.toString());
-				} catch (ClientProtocolException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			}
-		}).start();
-	}
-	
-	public void postPedido(final Pedido pedido) {
+	private String retorno = "";
+	private Boolean erro = null;
+	private int idUnique = -1;
+
+	public void postLocalizacao(final int id, final int id_onibus,
+			final double latitude, final double longitude) throws UnconnectedException {
 		new Thread(new Runnable() {
 
 			@Override
 			public void run() {
 				HttpClient httpClient = new DefaultHttpClient();
-				HttpPost httpPost = new HttpPost("http://joaoemedeiros.com/services/onibus_social/set_pedidos.php");
-				
+				HttpPost httpPost = new HttpPost(
+						"http://joaoemedeiros.com/services/onibus_social/set_localizacao.php");
+
 				List<NameValuePair> nameValuePair = new ArrayList<NameValuePair>();
-				nameValuePair.add(new BasicNameValuePair("nome", pedido.getNome()));
-				nameValuePair.add(new BasicNameValuePair("email", pedido.getEmail()));
-				nameValuePair.add(new BasicNameValuePair("cidade", pedido.getCidade()));
-				nameValuePair.add(new BasicNameValuePair("estado", pedido.getEstado()));
-				
+				nameValuePair.add(new BasicNameValuePair("id", String
+						.valueOf(id)));
+				nameValuePair.add(new BasicNameValuePair("onibus", String
+						.valueOf(id_onibus)));
+				nameValuePair.add(new BasicNameValuePair("localizacao", String
+						.valueOf(latitude) + ":" + String.valueOf(longitude)));
+
+				try {
+					httpPost.setEntity(new UrlEncodedFormEntity(nameValuePair));
+				} catch (UnsupportedEncodingException e) {
+					e.printStackTrace();
+				}
+
+				try {
+					HttpResponse response = httpClient.execute(httpPost);
+					Log.d("Http Response", response.toString());
+				} catch (ClientProtocolException e) {
+					e.printStackTrace();
+				} catch (IOException e) {
+					e.printStackTrace();
+					setErro(true);
+				}
+				setErro(false);
+			}
+		}).start();
+		while(isErro() == null);
+		if(isErro())
+			throw new UnconnectedException();
+	}
+
+	public void postPedido(final Pedido pedido) throws UnconnectedException {
+		new Thread(new Runnable() {
+
+			@Override
+			public void run() {
+				HttpClient httpClient = new DefaultHttpClient();
+				HttpPost httpPost = new HttpPost(
+						"http://joaoemedeiros.com/services/onibus_social/set_pedidos.php");
+
+				List<NameValuePair> nameValuePair = new ArrayList<NameValuePair>();
+				nameValuePair.add(new BasicNameValuePair("nome", pedido
+						.getNome()));
+				nameValuePair.add(new BasicNameValuePair("email", pedido
+						.getEmail()));
+				nameValuePair.add(new BasicNameValuePair("cidade", pedido
+						.getCidade()));
+				nameValuePair.add(new BasicNameValuePair("estado", pedido
+						.getEstado()));
+
 				try {
 					httpPost.setEntity(new UrlEncodedFormEntity(nameValuePair));
 				} catch (UnsupportedEncodingException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-				
+
 				HttpResponse response;
 				try {
 					response = httpClient.execute(httpPost);
-					
+
 					Log.d("Http Response", response.toString());
 				} catch (ClientProtocolException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
+					setErro(true);
 					e.printStackTrace();
 				}
-				
+				setErro(false);
 			}
-			
+
 		}).start();
+		while(isErro() == null);
+		if(isErro())
+			throw new UnconnectedException();
 	}
-	
-	public String getOnibus() {
+
+	public String getOnibus() throws UnconnectedException {
 		new Thread(new Runnable() {
-			
+
 			@Override
 			public void run() {
 				InputStream inputStream = null;
 				String result = "";
-				
+
 				try {
 					HttpClient httpClient = new DefaultHttpClient();
-					HttpGet httpGet = new HttpGet("http://joaoemedeiros.com/services/onibus_social/get_onibus.php");
+					HttpGet httpGet = new HttpGet(
+							"http://joaoemedeiros.com/services/onibus_social/get_onibus.php");
 					HttpResponse response = httpClient.execute(httpGet);
 					inputStream = response.getEntity().getContent();
-					if(inputStream != null) {
+					if (inputStream != null) {
 						result = converterInputStreamToString(inputStream);
 					} else {
 						result = null;
 					}
-						
+
 					Log.d("Http Response", result);
 					setRetorno(result);
 				} catch (ClientProtocolException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
+					setErro(true);
 					e.printStackTrace();
 				}
+				setErro(false);
 			}
 		}).start();
-		while(getRetorno() == "");
+		while(isErro() == null);
+		if(isErro())
+			throw new UnconnectedException();
 		return getRetorno();
 	}
-	
-	public String getLocalizacao(int id_onibus) {
+
+	public String getLocalizacao(int id_onibus) throws UnconnectedException {
 		InputStream inputStream = null;
 		String result = "";
 		String url;
-		if(id_onibus != 0)
-			url = "http://joaoemedeiros.com/services/onibus_social/get_localizacao.php?onibus=" + id_onibus;
+		if (id_onibus != 0)
+			url = "http://joaoemedeiros.com/services/onibus_social/get_localizacao.php?onibus="
+					+ id_onibus;
 		else
 			url = "http://joaoemedeiros.com/services/onibus_social/get_localizacao.php";
-		
+
 		try {
 			HttpClient httpClient = new DefaultHttpClient();
 			HttpGet httpGet = new HttpGet(url);
 			HttpResponse response;
 			response = httpClient.execute(httpGet);
 			inputStream = response.getEntity().getContent();
-			if(inputStream != null) {
+			if (inputStream != null) {
 				result = converterInputStreamToString(inputStream);
 			} else {
 				result = null;
 			}
 		} catch (ClientProtocolException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
+			setErro(true);
 			e.printStackTrace();
 		}
-		
+		if(erro == null)
+			setErro(false);
+		if(isErro())
+			throw new UnconnectedException();
 		return result;
 	}
-	
-	public int getUniqueId() {
+
+	public int getUniqueId() throws UnconnectedException {
 		new Thread(new Runnable() {
-			
+
 			@Override
 			public void run() {
 				// TODO Auto-generated method stub
 				InputStream inputStream = null;
 				String result = "";
 				String url = "http://joaoemedeiros.com/services/onibus_social/get_unique_id.php";
-				
+
 				try {
 					HttpClient httpClient = new DefaultHttpClient();
 					HttpGet httpGet = new HttpGet(url);
 					HttpResponse response;
 					response = httpClient.execute(httpGet);
 					inputStream = response.getEntity().getContent();
-					if(inputStream != null) {
+					if (inputStream != null) {
 						result = converterInputStreamToString(inputStream);
 					} else {
 						result = null;
 					}
-					if(result != null) {
+					if (result != null) {
 						int retorno = 0;
 						try {
 							JSONObject jsonObj = new JSONObject(result);
@@ -202,20 +224,25 @@ public class HttpConnectionOnibusBD {
 				} catch (ClientProtocolException e) {
 					e.printStackTrace();
 				} catch (IOException e) {
+					setErro(true);
 					e.printStackTrace();
 				}
+				setErro(false);
 			}
 		}).start();
-		while(getIdUnique() == -1);
+		while(isErro() == null);
+		if(isErro())
+			throw new UnconnectedException();		
 		return getIdUnique();
 	}
-	
+
 	private String converterInputStreamToString(InputStream inputStream) {
 		String result = "";
-		BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
+		BufferedReader bufferedReader = new BufferedReader(
+				new InputStreamReader(inputStream));
 		String line = "";
 		try {
-			while((line = bufferedReader.readLine()) != null) 
+			while ((line = bufferedReader.readLine()) != null)
 				result += line;
 			inputStream.close();
 		} catch (IOException e) {
@@ -224,7 +251,6 @@ public class HttpConnectionOnibusBD {
 		}
 		return result;
 	}
-	
 
 	public String getRetorno() {
 		return retorno;
@@ -240,6 +266,14 @@ public class HttpConnectionOnibusBD {
 
 	public void setIdUnique(int idUnique) {
 		this.idUnique = idUnique;
+	}
+
+	public Boolean isErro() {
+		return erro;
+	}
+
+	public void setErro(Boolean erro) {
+		this.erro = erro;
 	}
 	
 }

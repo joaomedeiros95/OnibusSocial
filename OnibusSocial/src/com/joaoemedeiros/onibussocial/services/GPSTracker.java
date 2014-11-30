@@ -16,6 +16,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.joaoemedeiros.onibussocial.R;
+import com.joaoemedeiros.onibussocial.exceptions.UnconnectedException;
 import com.joaoemedeiros.onibussocial.mysql.ConnectorImpl;
 
 public class GPSTracker extends Service {
@@ -55,7 +56,12 @@ public class GPSTracker extends Service {
 				boolean pontoEnviado = false;
 				if(location.hasAccuracy() && location.getAccuracy() <= MIN_ACURRACY_METERS) {
 					pontoEnviado = true;
-					connector.setLocationTracker(location.getLatitude(), location.getLongitude(), onibus, id);
+					try {
+						connector.setLocationTracker(location.getLatitude(), location.getLongitude(), onibus, id);
+					} catch (UnconnectedException e) {
+						e.printStackTrace();
+						Toast.makeText(getApplicationContext(), "OnibusSocial: Verifique sua conexão com Internet", Toast.LENGTH_LONG).show();
+					}
 				}
 				if(pontoEnviado) {
 					Log.d("Location Received", "lat :" + location.getLatitude() + ",lng :" + location.getLongitude());

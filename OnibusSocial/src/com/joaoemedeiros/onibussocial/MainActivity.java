@@ -2,16 +2,23 @@ package com.joaoemedeiros.onibussocial;
 
 import java.util.Locale;
 
+import com.joaoemedeiros.onibussocial.mysql.OnibusDAO;
 
-import android.support.v7.app.ActionBarActivity;
-import android.support.v7.app.ActionBar;
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.DialogInterface.OnClickListener;
+import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.FragmentPagerAdapter;
-import android.content.Intent;
-import android.os.Bundle;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -26,6 +33,8 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
      * {@link android.support.v4.app.FragmentStatePagerAdapter}.
      */
     SectionsPagerAdapter mSectionsPagerAdapter;
+    public static Context context;
+    public static Context dialogContext;
 
     /**
      * The {@link ViewPager} that will host the section contents.
@@ -48,6 +57,9 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
         // Set up the ViewPager with the sections adapter.
         mViewPager = (ViewPager) findViewById(R.id.pager);
         mViewPager.setAdapter(mSectionsPagerAdapter);
+        
+        context = getApplicationContext();
+        dialogContext = MainActivity.this;
 
         // When swiping between different sections, select the corresponding
         // tab. We can also use ActionBar.Tab#select() to do this if we have
@@ -72,8 +84,12 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
         }
         
     }
-
-
+    
+    @Override
+    protected void onResume() {
+    	super.onResume();
+    }
+    
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         
@@ -118,8 +134,38 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
     @Override
     public void onTabReselected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
     }
+    
+    public static void isConnected() {
+		ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+		 
+		NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+		boolean isConnected = activeNetwork != null &&
+		                      activeNetwork.isConnectedOrConnecting();
+		
+		if(!isConnected)
+			callDialog();
+	}
 
-    /**
+    private static void callDialog() {
+    	AlertDialog.Builder builder = new AlertDialog.Builder(dialogContext);
+		builder.setMessage("Esse aplicativo só funciona com conexão de internet, favor habilitar conexão com a rede.")
+		       .setCancelable(false)
+		       .setTitle("Internet Desconectada")
+		       .setNeutralButton("Ok", new OnClickListener() {
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					OnibusDAO dao = OnibusDAO.getDAO();
+					if(dao.getAllOnibus(context).size() == 0) {
+						System.exit(0);
+					}
+				}
+			});
+		builder.create().show();
+	}
+
+
+
+	/**
      * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
      * one of the sections/tabs/pages.
      */
