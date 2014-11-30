@@ -89,11 +89,15 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
         switch (id) {
-		case R.id.action_settings:
-			return true;
+		/*case R.id.action_settings:
+			return true;*/
 		case R.id.action_about:
 			Intent intent = new Intent(this, AboutActivity.class);
 			startActivity(intent);
+			return true;
+		case R.id.action_pedidos:
+			Intent intent1 = new Intent(this, PedidosActivity.class);
+			startActivity(intent1);
 			return true;
 		default:
 			return super.onOptionsItemSelected(item);

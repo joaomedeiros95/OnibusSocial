@@ -22,6 +22,8 @@ import org.json.JSONObject;
 
 import android.util.Log;
 
+import com.joaoemedeiros.onibussocial.bd.model.Pedido;
+
 public class HttpConnectionOnibusBD {
 	String retorno = "";
 	int idUnique = -1;
@@ -57,6 +59,45 @@ public class HttpConnectionOnibusBD {
 					e.printStackTrace();
 				}
 			}
+		}).start();
+	}
+	
+	public void postPedido(final Pedido pedido) {
+		new Thread(new Runnable() {
+
+			@Override
+			public void run() {
+				HttpClient httpClient = new DefaultHttpClient();
+				HttpPost httpPost = new HttpPost("http://joaoemedeiros.com/services/onibus_social/set_pedidos.php");
+				
+				List<NameValuePair> nameValuePair = new ArrayList<NameValuePair>();
+				nameValuePair.add(new BasicNameValuePair("nome", pedido.getNome()));
+				nameValuePair.add(new BasicNameValuePair("email", pedido.getEmail()));
+				nameValuePair.add(new BasicNameValuePair("cidade", pedido.getCidade()));
+				nameValuePair.add(new BasicNameValuePair("estado", pedido.getEstado()));
+				
+				try {
+					httpPost.setEntity(new UrlEncodedFormEntity(nameValuePair));
+				} catch (UnsupportedEncodingException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				
+				HttpResponse response;
+				try {
+					response = httpClient.execute(httpPost);
+					
+					Log.d("Http Response", response.toString());
+				} catch (ClientProtocolException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				
+			}
+			
 		}).start();
 	}
 	

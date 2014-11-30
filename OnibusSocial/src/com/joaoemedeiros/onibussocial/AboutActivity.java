@@ -1,5 +1,6 @@
 package com.joaoemedeiros.onibussocial;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import android.support.v7.app.ActionBarActivity;
@@ -7,8 +8,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 /**
- * Activity para a página About.
- * @author JoãoEduardo
+ * Activity para a pï¿½gina About.
+ * @author Joï¿½oEduardo
  */
 
 public class AboutActivity extends ActionBarActivity {
@@ -34,9 +35,13 @@ public class AboutActivity extends ActionBarActivity {
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
         switch (id) {
-		case R.id.action_settings:
-			return true;
+		/*case R.id.action_settings:
+			return true;*/
 		case R.id.action_about:
+			return true;
+		case R.id.action_pedidos:
+			Intent intent1 = new Intent(this, PedidosActivity.class);
+			startActivity(intent1);
 			return true;
 		default:
 			return super.onOptionsItemSelected(item);

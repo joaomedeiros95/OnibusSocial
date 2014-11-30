@@ -15,5 +15,14 @@
     <string name="UFRN">UFRN</string>
     <string name="IMD">IMD</string>
     <string name="servicoiniciado">OnibusSocial está coletando seus dados de GPS.</string>
+    <string name="title_activity_pedidos">Pedidos</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="explicacao_pedidos">Utilize essa funcionalidade para realizar um pedido de integração
+        de alguma cidade ao app, atenderemos ao seu pedido mais cedo o possível.</string>
+    <string name="nome">Nome:</string>
+    <string name="email">Email:</string>
+    <string name="cidade">Cidade:</string>
+    <string name="estado">Estado:</string>
+    <string name="enviar">Enviar</string>
 
 </resources>
